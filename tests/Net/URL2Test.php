@@ -827,28 +827,30 @@ class Net_URL2Test extends PHPUnit_Framework_TestCase
     {
         return array(
             // String equivalence:
-            array('http://example.com/', 'http://example.com/'),
+            array('http://example.com/', 'http://example.com/', true),
 
             // Originally first dataset:
-            array('http://www.example.com/%9a', 'http://www.example.com/%9A'),
+            array('http://www.example.com/%9a', 'http://www.example.com/%9A', false),
 
             // Example from RFC 3986 6.2.2.:
-            array('example://a/b/c/%7Bfoo%7D', 'eXAMPLE://a/./b/../b/%63/%7bfoo%7d'),
+            array('example://a/b/c/%7Bfoo%7D', 'eXAMPLE://a/./b/../b/%63/%7bfoo%7d', false),
 
             // Example from RFC 3986 6.2.2.1.:
-            array('HTTP://www.EXAMPLE.com/', 'http://www.example.com/'),
+            array('HTTP://www.EXAMPLE.com/', 'http://www.example.com/', false),
 
             // Example from RFC 3986 6.2.3.:
             array(
-                'http://example.com', 'http://example.com/',
-                'http://example.com:/', 'http://example.com:80/'
+                'http://example.com', 'http://example.com/', false
+            ),
+            array(
+                'http://example.com:/', 'http://example.com:80/', false
             ),
 
             // Bug #20161: URLs with "0" as host fail to normalize with empty path
-            array('http://0/', 'http://0'),
+            array('http://0/', 'http://0', false),
 
             // Bug #20473: Normalize query and fragment broken
-            array('foo:///?%66%6f%6f#%62%61%72', 'foo:///?foo#bar'),
+            array('foo:///?%66%6f%6f#%62%61%72', 'foo:///?foo#bar', false),
         );
     }
 
@@ -861,22 +863,19 @@ class Net_URL2Test extends PHPUnit_Framework_TestCase
      * @dataProvider provideEquivalentUrlLists
      */
     #[PHPUnit\Framework\Attributes\DataProvider('provideEquivalentUrlLists')]
-    public function testNormalize()
+    public function testNormalize(string $urlOne, string $urlTwo, bool $identical)
     {
-        $urls = func_get_args();
+        $urlOne = new Net_Url2($urlOne);
+        $urlTwo = new Net_Url2($urlTwo);
 
-        $this->assertGreaterThanOrEqual(2, count($urls));
-
-        $last = null;
-
-        foreach ($urls as $index => $url) {
-            $url = new Net_Url2($url);
-            $url->normalize();
-            if ($index) {
-                $this->assertSame((string)$last, (string)$url);
-            }
-            $last = $url;
+        if (! $identical) {
+            $this->assertNotSame($urlOne->__toString(), $urlTwo->__toString());
         }
+
+        $urlOne->normalize();
+        $urlTwo->normalize();
+
+        $this->assertSame($urlOne->__toString(), $urlTwo->__toString());
     }
 
     /**
@@ -952,14 +951,17 @@ class Net_URL2Test extends PHPUnit_Framework_TestCase
      * @return void
      */
     #[PHPUnit\Framework\Attributes\DataProvider('provideEquivalentUrlLists')]
-    public function testConstructSelf()
+    public function testConstructSelf(string $urlOne, string $urlTwo, bool $identical)
     {
-        $urls = func_get_args();
-        foreach ($urls as $url) {
-            $urlA = new Net_URL2($url);
-            $urlB = new Net_URL2($urlA);
-            $this->assertSame((string)$urlA, (string)$urlB);
-        }
+        $urlOne = new Net_Url2($urlOne);
+        $urlOneExtended = new Net_Url2($urlOne);
+
+        $this->assertSame($urlOne->__toString(), $urlOneExtended->__toString());
+
+        $urlTwo = new Net_Url2($urlTwo);
+        $urlTwoExtended = new Net_Url2($urlTwo);
+
+        $this->assertSame($urlTwo->__toString(), $urlTwoExtended->__toString());
     }
 
     /**
