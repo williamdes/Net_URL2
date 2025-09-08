@@ -863,7 +863,7 @@ class Net_URL2Test extends PHPUnit_Framework_TestCase
      * @dataProvider provideEquivalentUrlLists
      */
     #[PHPUnit\Framework\Attributes\DataProvider('provideEquivalentUrlLists')]
-    public function testNormalize(string $urlOne, string $urlTwo, bool $identical)
+    public function testNormalize($urlOne, $urlTwo, $identical)
     {
         $urlOne = new Net_Url2($urlOne);
         $urlTwo = new Net_Url2($urlTwo);
@@ -951,7 +951,7 @@ class Net_URL2Test extends PHPUnit_Framework_TestCase
      * @return void
      */
     #[PHPUnit\Framework\Attributes\DataProvider('provideEquivalentUrlLists')]
-    public function testConstructSelf(string $urlOne, string $urlTwo, bool $identical)
+    public function testConstructSelf($urlOne, $urlTwo, $identical)
     {
         $urlOne = new Net_Url2($urlOne);
         $urlOneExtended = new Net_Url2($urlOne);
