@@ -31,7 +31,7 @@
         "source": "https://github.com/pear/Net_URL2"
     },
     "require": {
-        "php": ">=5.1.4"
+        "php": ">=5.3"
     },
     "autoload": {
         "classmap": ["Net/URL2.php"]
@@ -45,7 +45,7 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": ">=3.3.0"
+        "phpunit/phpunit": ">=4.8"
     },
     "scripts": {
         "test": "phpunit"
